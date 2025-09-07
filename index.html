@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DEADS SWAP - Trade DEADS tokens on BSC</title>
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Cinzel', serif;
+            background: #0a0a0a;
+            color: #f5f5dc;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .bg-pattern {
+            background-image: 
+                radial-gradient(circle at 25% 25%, rgba(139, 69, 19, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(220, 20, 60, 0.1) 0%, transparent 50%);
+        }
+        
+        .main-container {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 50%, #1a1a1a 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .skull-bg {
+            position: absolute;
+            opacity: 0.1;
+            font-size: 200px;
+            color: #f5f5dc;
+            animation: pulse 3s ease-in-out infinite;
+        }
+        
+        .skull-bg.top-left { top: 80px; left: 80px; }
+        .skull-bg.bottom-right { bottom: 80px; right: 80px; font-size: 150px; animation-delay: 1s; }
+        .skull-bg.middle-left { top: 50%; left: 40px; font-size: 100px; animation-delay: 2s; }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.1; transform: scale(1); }
+            50% { opacity: 0.2; transform: scale(1.05); }
+        }
+        
+        .content {
+            position: relative;
+            z-index: 10;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .title {
+            font-size: 3.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #f5f5dc, #faf0e6, #d3d3d3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+        }
+        
+        .subtitle {
+            color: #888;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .badge {
+            background: rgba(139, 0, 0, 0.3);
+            color: #ff6b6b;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            border: 1px solid #8b0000;
+            font-size: 0.9rem;
+        }
+        
+        .wallet-section {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .connect-btn {
+            background: linear-gradient(135deg, #8b0000, #b22222);
+            color: #f5f5dc;
+            padding: 1rem 2rem;
+            border: 2px solid #8b0000;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(139, 0, 0, 0.5);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .connect-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 12px 30px rgba(220, 20, 60, 0.7);
+        }
+        
+        .connect-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .wallet-info {
+            background: rgba(0, 255, 0, 0.1);
+            border: 1px solid #00ff00;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            display: inline-block;
+            margin-bottom: 0.5rem;
+        }
+        
+        .wallet-address {
+            font-family: 'Courier New', monospace;
+            background: rgba(40, 40, 40, 0.8);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            border: 1px solid #444;
+            font-size: 0.9rem;
+        }
+        
+        .balance-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .balance-card {
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid #444;
+            border-radius: 12px;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+            transition: transform 0.2s ease;
+        }
+        
+        .balance-card:hover {
+            transform: translateY(-2px);
+        }
+        
+        .balance-title {
+            color: #f5f5dc;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .balance-amount {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+        
+        .bnb-balance { color: #ffd700; }
+        .deads-balance { color: #ff6b6b; }
+        .price-info { color: #4ade80; }
+        
+        .swap-container {
+            max-width: 600px;
+            margin: 0 auto 2rem;
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #444;
+            border-radius: 16px;
+            padding: 2rem;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 20px 40px rgba(139, 0, 0, 0.2);
+        }
+        
+        .swap-title {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        
+        .tabs {
+            display: flex;
+            background: #2a2a2a;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 8px;
+        }
+        
+        .tab.active {
+            background: #8b0000;
+            color: #f5f5dc;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .input-label {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .balance-info {
+            color: #888;
+            font-size: 0.8rem;
+        }
+        
+        .input-field {
+            width: 100%;
+            padding: 1rem;
+            background: #2a2a2a;
+            border: 1px solid #444;
+            border-radius: 8px;
+            color: #f5f5dc;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+        
+        .input-field:focus {
+            outline: none;
+            border-color: #8b0000;
+            box-shadow: 0 0 10px rgba(139, 0, 0, 0.3);
+        }
+        
+        .conversion-info {
+            color: #888;
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+        }
+        
+        .swap-btn {
+            width: 100%;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, #8b0000, #b22222, #000);
+            color: #f5f5dc;
+            border: 2px solid #8b0000;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            text-shadow: 0 0 10px rgba(245, 245, 220, 0.5);
+        }
+        
+        .swap-btn:hover:not(:disabled) {
+            transform: scale(1.02);
+            box-shadow: 0 0 30px rgba(220, 20, 60, 0.7);
+            text-shadow: 0 0 15px rgba(245, 245, 220, 0.8);
+        }
+        
+        .swap-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .sell-btn {
+            background: linear-gradient(135deg, #4a4a4a, #2a2a2a, #000);
+            border-color: #666;
+        }
+        
+        .sell-btn:hover:not(:disabled) {
+            box-shadow: 0 0 30px rgba(100, 100, 100, 0.5);
+        }
+        
+        .manual-swap {
+            max-width: 800px;
+            margin: 0 auto 2rem;
+            background: linear-gradient(135deg, rgba(139, 69, 19, 0.2), rgba(139, 0, 0, 0.2));
+            border: 1px solid #ff8c00;
+            border-radius: 16px;
+            padding: 2rem;
+            backdrop-filter: blur(15px);
+        }
+        
+        .manual-title {
+            text-align: center;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        
+        .manual-subtitle {
+            text-align: center;
+            color: #ffb366;
+            margin-bottom: 1.5rem;
+        }
+        
+        .manual-process {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid #ff8c00;
+            margin-bottom: 1.5rem;
+        }
+        
+        .process-title {
+            color: #f5f5dc;
+            font-size: 1.1rem;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+        
+        .address-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .address-badge {
+            background: #ff8c00;
+            color: #000;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .copy-btn {
+            background: transparent;
+            border: 1px solid #ff8c00;
+            color: #ff8c00;
+            padding: 0.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .copy-btn:hover {
+            background: rgba(255, 140, 0, 0.1);
+        }
+        
+        .features {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2rem;
+            font-size: 0.9rem;
+            color: #ffb366;
+            margin-bottom: 1rem;
+        }
+        
+        .steps-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .step-card {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 140, 0, 0.5);
+            text-align: center;
+        }
+        
+        .step-title {
+            color: #ffb366;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .disclaimer {
+            text-align: center;
+            font-size: 0.75rem;
+            color: #888;
+            font-style: italic;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 4rem;
+            color: #666;
+        }
+        
+        .footer-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .contract-info {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+        }
+        
+        .icon-btn {
+            background: transparent;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            padding: 0.25rem;
+            transition: color 0.3s ease;
+        }
+        
+        .icon-btn:hover {
+            color: #ff6b6b;
+        }
+        
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #1a1a1a;
+            border: 1px solid #444;
+            color: #f5f5dc;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+            max-width: 350px;
+        }
+        
+        .toast.show {
+            transform: translateX(0);
+        }
+        
+        .toast.success { border-color: #00ff00; }
+        .toast.error { border-color: #ff0000; }
+        .toast.info { border-color: #00bfff; }
+        
+        .hidden { display: none !important; }
+        .spinner { animation: spin 1s linear infinite; }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 768px) {
+            .title { font-size: 2.5rem; flex-direction: column; }
+            .balance-grid { grid-template-columns: 1fr; }
+            .features { flex-direction: column; gap: 1rem; }
+            .steps-container { grid-template-columns: 1fr; }
+            .content { padding: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container bg-pattern">
+        <!-- Skull Background Effects -->
+        <div class="skull-bg top-left">💀</div>
+        <div class="skull-bg bottom-right">💀</div>
+        <div class="skull-bg middle-left">💀</div>
+        
+        <div class="content">
+            <!-- Header -->
+            <header class="header">
+                <h1 class="title">
+                    💀 DEADS SWAP 💀
+                </h1>
+                <p class="subtitle">
+                    Trade DEADS tokens on BSC • Enter the realm of the dead
+                </p>
+                <div class="badge">
+                    BSC Network • Live
+                </div>
+            </header>
+            
+            <!-- Wallet Connection -->
+            <div class="wallet-section">
+                <div id="walletDisconnected">
+                    <button id="connectBtn" class="connect-btn">
+                        <i class="fas fa-wallet"></i>
+                        Connect MetaMask
+                    </button>
+                </div>
+                
+                <div id="walletConnected" class="hidden">
+                    <div class="wallet-info">
+                        Connected to BSC
+                    </div>
+                    <div class="wallet-address" id="walletAddress">
+                        0x...
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Balance Display -->
+            <div id="balanceSection" class="balance-grid hidden">
+                <div class="balance-card">
+                    <div class="balance-title">BNB Balance</div>
+                    <div class="balance-amount bnb-balance" id="bnbBalance">0.0000 BNB</div>
+                </div>
+                <div class="balance-card">
+                    <div class="balance-title">
+                        <i class="fas fa-skull"></i> DEADS Balance
+                    </div>
+                    <div class="balance-amount deads-balance" id="deadsBalance">0.00 DEADS</div>
+                </div>
+                <div class="balance-card">
+                    <div class="balance-title">
+                        <i class="fas fa-chart-line"></i> Current Price
+                    </div>
+                    <div class="balance-amount price-info" id="currentPrice">1 BNB = 0 DEADS</div>
+                </div>
+            </div>
+            
+            <!-- Swap Interface -->
+            <div id="swapSection" class="swap-container hidden">
+                <h2 class="swap-title">
+                    <i class="fas fa-exchange-alt"></i>
+                    Swap Interface
+                </h2>
+                <p style="text-align: center; color: #888; margin-bottom: 1.5rem;">
+                    Enter the amounts below to trade • Real BSC transactions
+                </p>
+                
+                <div class="tabs">
+                    <div class="tab active" data-tab="buy">Buy DEADS</div>
+                    <div class="tab" data-tab="sell">Sell DEADS</div>
+                </div>
+                
+                <div id="buyTab" class="tab-content active">
+                    <div class="input-group">
+                        <div class="input-label">
+                            <span>BNB Amount</span>
+                            <span class="balance-info">Balance: <span id="bnbBalanceSmall">0.0000</span> BNB</span>
+                        </div>
+                        <input type="number" id="bnbAmount" class="input-field" placeholder="0.0" step="0.001">
+                        <div class="conversion-info" id="bnbConversion">≈ 0 DEADS</div>
+                    </div>
+                    <button id="buyBtn" class="swap-btn">
+                        <i class="fas fa-skull" id="buyIcon"></i>
+                        <span id="buyText">BUY DEADS</span>
+                    </button>
+                </div>
+                
+                <div id="sellTab" class="tab-content">
+                    <div class="input-group">
+                        <div class="input-label">
+                            <span>DEADS Amount</span>
+                            <span class="balance-info">Balance: <span id="deadsBalanceSmall">0.00</span> DEADS</span>
+                        </div>
+                        <input type="number" id="deadsAmount" class="input-field" placeholder="0.0" step="0.01">
+                        <div class="conversion-info" id="deadsConversion">≈ 0 BNB</div>
+                    </div>
+                    <button id="sellBtn" class="swap-btn sell-btn">
+                        <i class="fas fa-arrow-down" id="sellIcon"></i>
+                        <span id="sellText">SELL DEADS</span>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Manual Swap Fallback -->
+            <div class="manual-swap">
+                <h2 class="manual-title">
+                    <i class="fas fa-skull"></i>
+                    Manual Swap Available
+                    <i class="fas fa-skull"></i>
+                </h2>
+                <p class="manual-subtitle">
+                    If the automatic swap doesn't work, use our manual service
+                </p>
+                
+                <div class="manual-process">
+                    <p class="process-title">
+                        🔄 Manual Swap Process:
+                    </p>
+                    <p style="text-align: center; color: #ffb366; margin-bottom: 1rem;">
+                        Send your BNB to this address and receive DEADS within 24 hours maximum!
+                    </p>
+                    
+                    <div class="address-container">
+                        <div class="address-badge">
+                            0x5E02B3C73a9285aa17E5E3F6D1a3bdF6Ac7ae6E3
+                        </div>
+                        <button class="copy-btn" onclick="copyAddress()">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="features">
+                        <span>⚡ Fast Processing</span>
+                        <span>🛡️ Secure</span>
+                        <span>⏰ Max 24h Delivery</span>
+                    </div>
+                </div>
+                
+                <div class="steps-container">
+                    <div class="step-card">
+                        <div class="step-title">Step 1:</div>
+                        <div>Send BNB to the address above</div>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-title">Step 2:</div>
+                        <div>Wait for confirmation</div>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-title">Step 3:</div>
+                        <div>Receive DEADS in your wallet</div>
+                    </div>
+                </div>
+                
+                <div class="disclaimer">
+                    * Manual swaps are processed at current market rate • No extra fees • Guaranteed delivery
+                </div>
+            </div>
+            
+            <!-- Footer -->
+            <footer class="footer">
+                <div class="footer-content">
+                    <i class="fas fa-skull"></i>
+                    <span>Powered by the underworld • BSC Network</span>
+                    <i class="fas fa-skull"></i>
+                </div>
+                <div class="contract-info">
+                    <span>Contract: 0xb2855c8c0b9af305281d7b417cb2158ed8dc676d</span>
+                    <button class="icon-btn" onclick="copyContract()">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                    <button class="icon-btn" onclick="openBscScan()">
+                        <i class="fas fa-external-link-alt"></i>
+                    </button>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <script>
+        // Configuration
+        const BSC_CONFIG = {
+            chainId: '0x38',
+            chainName: 'BNB Smart Chain',
+            nativeCurrency: { name: 'BNB', symbol: 'BNB', decimals: 18 },
+            rpcUrls: ['https://bsc-dataseed.binance.org/'],
+            blockExplorerUrls: ['https://bscscan.com/'],
+        };
+
+        const CONTRACT_ADDRESS = '0xb2855c8c0b9af305281d7b417cb2158ed8dc676d';
+        const CONTRACT_ABI = [
+            "function balanceOf(address) view returns (uint256)",
+            "function bnbPriceInDeads() view returns (uint256)",
+            "function buyDeadsWithBnb() payable",
+            "function swapDeadsForBnb(uint256 deadAmount)",
+            "function name() view returns (string)",
+            "function symbol() view returns (string)",
+            "function decimals() view returns (uint8)"
+        ];
+
+        // Global variables
+        let provider, signer, contract;
+        let walletAddress = '';
+        let isLoading = false;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            setupEventListeners();
+            checkWalletConnection();
+        });
+
+        function setupEventListeners() {
+            document.getElementById('connectBtn').addEventListener('click', connectWallet);
+            
+            // Tab switching
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', () => switchTab(tab.dataset.tab));
+            });
+
+            // Input listeners
+            document.getElementById('bnbAmount').addEventListener('input', updateBnbConversion);
+            document.getElementById('deadsAmount').addEventListener('input', updateDeadsConversion);
+            
+            // Swap buttons
+            document.getElementById('buyBtn').addEventListener('click', buyDeads);
+            document.getElementById('sellBtn').addEventListener('click', sellDeads);
+
+            // Wallet events
+            if (window.ethereum) {
+                window.ethereum.on('accountsChanged', handleAccountsChanged);
+                window.ethereum.on('chainChanged', () => window.location.reload());
+            }
+        }
+
+        async function checkWalletConnection() {
+            if (window.ethereum) {
+                try {
+                    const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+                    if (accounts.length > 0) {
+                        await initializeWallet();
+                    }
+                } catch (error) {
+                    console.error('Error checking wallet connection:', error);
+                }
+            }
+        }
+
+        async function connectWallet() {
+            if (!window.ethereum) {
+                showToast('MetaMask not installed! Please install MetaMask.', 'error');
+                return;
+            }
+
+            try {
+                setLoading(true);
+                await initializeWallet();
+            } catch (error) {
+                console.error('Connection error:', error);
+                showToast(`Connection failed: ${error.message}`, 'error');
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        async function initializeWallet() {
+            try {
+                const web3Provider = new ethers.providers.Web3Provider(window.ethereum);
+                const network = await web3Provider.getNetwork();
+
+                if (network.chainId !== 56) {
+                    await switchToBSC();
+                    return;
+                }
+
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                const walletSigner = web3Provider.getSigner();
+                const contractInstance = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, walletSigner);
+
+                provider = web3Provider;
+                signer = walletSigner;
+                contract = contractInstance;
+                walletAddress = accounts[0];
+
+                updateWalletUI();
+                await loadBalances();
+                
+                showToast('Wallet connected to BSC! 💀', 'success');
+            } catch (error) {
+                throw error;
+            }
+        }
+
+        async function switchToBSC() {
+            try {
+                await window.ethereum.request({
+                    method: 'wallet_switchEthereumChain',
+                    params: [{ chainId: BSC_CONFIG.chainId }],
+                });
+            } catch (switchError) {
+                if (switchError.code === 4902) {
+                    try {
+                        await window.ethereum.request({
+                            method: 'wallet_addEthereumChain',
+                            params: [BSC_CONFIG],
+                        });
+                    } catch (addError) {
+                        throw new Error('Failed to add BSC network');
+                    }
+                } else {
+                    throw switchError;
+                }
+            }
+        }
+
+        function updateWalletUI() {
+            document.getElementById('walletDisconnected').classList.add('hidden');
+            document.getElementById('walletConnected').classList.remove('hidden');
+            document.getElementById('balanceSection').classList.remove('hidden');
+            document.getElementById('swapSection').classList.remove('hidden');
+            
+            document.getElementById('walletAddress').textContent = 
+                `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`;
+        }
+
+        async function loadBalances() {
+            try {
+                const bnbBal = await provider.getBalance(walletAddress);
+                const bnbBalance = ethers.utils.formatEther(bnbBal);
+
+                const deadsBal = await contract.balanceOf(walletAddress);
+                const deadsBalance = ethers.utils.formatEther(deadsBal);
+
+                const price = await contract.bnbPriceInDeads();
+                const currentPrice = ethers.utils.formatEther(price);
+
+                document.getElementById('bnbBalance').textContent = `${parseFloat(bnbBalance).toFixed(4)} BNB`;
+                document.getElementById('deadsBalance').textContent = `${parseFloat(deadsBalance).toFixed(2)} DEADS`;
+                document.getElementById('currentPrice').textContent = `1 BNB = ${parseFloat(currentPrice).toLocaleString()} DEADS`;
+                
+                document.getElementById('bnbBalanceSmall').textContent = parseFloat(bnbBalance).toFixed(4);
+                document.getElementById('deadsBalanceSmall').textContent = parseFloat(deadsBalance).toFixed(2);
+
+                window.currentPriceValue = currentPrice;
+                window.bnbBalanceValue = bnbBalance;
+                window.deadsBalanceValue = deadsBalance;
+            } catch (error) {
+                console.error('Error loading balances:', error);
+                showToast('Failed to load balances', 'error');
+            }
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+            document.getElementById(`${tabName}Tab`).classList.add('active');
+        }
+
+        function updateBnbConversion() {
+            const bnbAmount = document.getElementById('bnbAmount').value;
+            if (bnbAmount && window.currentPriceValue) {
+                const deadsAmount = (parseFloat(bnbAmount) * parseFloat(window.currentPriceValue)).toFixed(4);
+                document.getElementById('bnbConversion').textContent = `≈ ${deadsAmount} DEADS`;
+            } else {
+                document.getElementById('bnbConversion').textContent = '≈ 0 DEADS';
+            }
+        }
+
+        function updateDeadsConversion() {
+            const deadsAmount = document.getElementById('deadsAmount').value;
+            if (deadsAmount && window.currentPriceValue) {
+                const bnbAmount = (parseFloat(deadsAmount) / parseFloat(window.currentPriceValue)).toFixed(6);
+                document.getElementById('deadsConversion').textContent = `≈ ${bnbAmount} BNB`;
+            } else {
+                document.getElementById('deadsConversion').textContent = '≈ 0 BNB';
+            }
+        }
+
+        async function buyDeads() {
+            const bnbAmount = document.getElementById('bnbAmount').value;
+            
+            if (!bnbAmount || parseFloat(bnbAmount) <= 0) {
+                showToast('Please enter a valid BNB amount', 'error');
+                return;
+            }
+            
+            if (parseFloat(bnbAmount) > parseFloat(window.bnbBalanceValue)) {
+                showToast('Insufficient BNB balance', 'error');
+                return;
+            }
+
+            try {
+                setLoading(true, 'buy');
+                
+                const value = ethers.utils.parseEther(bnbAmount);
+                
+                try {
+                    await contract.callStatic.buyDeadsWithBnb({ value });
+                } catch (staticError) {
+                    showToast('Transaction would fail. Check contract conditions.', 'error');
+                    return;
+                }
+                
+                let gasLimit;
+                try {
+                    const gasEstimate = await contract.estimateGas.buyDeadsWithBnb({ value });
+                    gasLimit = gasEstimate.mul(150).div(100);
+                } catch (gasError) {
+                    gasLimit = ethers.utils.hexlify(300000);
+                }
+                
+                const tx = await contract.buyDeadsWithBnb({ value, gasLimit });
+                
+                showToast(`Transaction sent: ${tx.hash}`, 'info');
+                
+                const receipt = await tx.wait();
+                
+                if (receipt.status === 1) {
+                    showToast('DEADS purchased successfully! 💀', 'success');
+                    document.getElementById('bnbAmount').value = '';
+                    await loadBalances();
+                } else {
+                    showToast('Transaction failed', 'error');
+                }
+                
+            } catch (error) {
+                console.error('Buy DEADS error:', error);
+                
+                if (error.code === 'ACTION_REJECTED') {
+                    showToast('Transaction rejected by user', 'error');
+                } else if (error.message.includes('insufficient funds')) {
+                    showToast('Insufficient BNB for transaction + gas fees', 'error');
+                } else {
+                    showToast(`Transaction failed: ${error.reason || error.message}`, 'error');
+                }
+            } finally {
+                setLoading(false, 'buy');
+            }
+        }
+
+        async function sellDeads() {
+            const deadsAmount = document.getElementById('deadsAmount').value;
+            
+            if (!deadsAmount || parseFloat(deadsAmount) <= 0) {
+                showToast('Please enter a valid DEADS amount', 'error');
+                return;
+            }
+            
+            if (parseFloat(deadsAmount) > parseFloat(window.deadsBalanceValue)) {
+                showToast('Insufficient DEADS balance', 'error');
+                return;
+            }
+
+            try {
+                setLoading(true, 'sell');
+                
+                const amount = ethers.utils.parseEther(deadsAmount);
+                
+                try {
+                    await contract.callStatic.swapDeadsForBnb(amount);
+                } catch (staticError) {
+                    showToast('Transaction would fail. Check contract conditions.', 'error');
+                    return;
+                }
+                
+                let gasLimit;
+                try {
+                    const gasEstimate = await contract.estimateGas.swapDeadsForBnb(amount);
+                    gasLimit = gasEstimate.mul(150).div(100);
+                } catch (gasError) {
+                    gasLimit = ethers.utils.hexlify(400000);
+                }
+                
+                const tx = await contract.swapDeadsForBnb(amount, { gasLimit });
+                
+                showToast(`Transaction sent: ${tx.hash}`, 'info');
+                
+                const receipt = await tx.wait();
+                
+                if (receipt.status === 1) {
+                    showToast('DEADS sold successfully! 💀', 'success');
+                    document.getElementById('deadsAmount').value = '';
+                    await loadBalances();
+                } else {
+                    showToast('Transaction failed', 'error');
+                }
+                
+            } catch (error) {
+                console.error('Sell DEADS error:', error);
+                
+                if (error.code === 'ACTION_REJECTED') {
+                    showToast('Transaction rejected by user', 'error');
+                } else if (error.message.includes('insufficient funds')) {
+                    showToast('Insufficient BNB for gas fees', 'error');
+                } else {
+                    showToast(`Transaction failed: ${error.reason || error.message}`, 'error');
+                }
+            } finally {
+                setLoading(false, 'sell');
+            }
+        }
+
+        function setLoading(loading, type = '') {
+            isLoading = loading;
+            
+            if (type === 'buy') {
+                const btn = document.getElementById('buyBtn');
+                const icon = document.getElementById('buyIcon');
+                const text = document.getElementById('buyText');
+                
+                btn.disabled = loading;
+                if (loading) {
+                    icon.className = 'fas fa-skull spinner';
+                    text.textContent = 'SUMMONING DEADS...';
+                } else {
+                    icon.className = 'fas fa-skull';
+                    text.textContent = 'BUY DEADS';
+                }
+            } else if (type === 'sell') {
+                const btn = document.getElementById('sellBtn');
+                const icon = document.getElementById('sellIcon');
+                const text = document.getElementById('sellText');
+                
+                btn.disabled = loading;
+                if (loading) {
+                    icon.className = 'fas fa-skull spinner';
+                    text.textContent = 'RELEASING SOULS...';
+                } else {
+                    icon.className = 'fas fa-arrow-down';
+                    text.textContent = 'SELL DEADS';
+                }
+            } else {
+                const connectBtn = document.getElementById('connectBtn');
+                connectBtn.disabled = loading;
+                if (loading) {
+                    connectBtn.innerHTML = '<div class="spinner">💀</div> Connecting...';
+                } else {
+                    connectBtn.innerHTML = '<i class="fas fa-wallet"></i> Connect MetaMask';
+                }
+            }
+        }
+
+        function handleAccountsChanged(accounts) {
+            if (accounts.length === 0) {
+                window.location.reload();
+            } else {
+                initializeWallet();
+            }
+        }
+
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type} show`;
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 5000);
+        }
+
+        function copyAddress() {
+            const address = '0x5E02B3C73a9285aa17E5E3F6D1a3bdF6Ac7ae6E3';
+            navigator.clipboard.writeText(address);
+            showToast('Manual swap address copied! 💀', 'success');
+        }
+
+        function copyContract() {
+            navigator.clipboard.writeText(CONTRACT_ADDRESS);
+            showToast('Contract address copied!', 'success');
+        }
+
+        function openBscScan() {
+            window.open(`https://bscscan.com/address/${CONTRACT_ADDRESS}`, '_blank');
+        }
+    </script>
+</body>
+</html>
