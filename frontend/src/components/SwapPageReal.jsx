@@ -319,6 +319,71 @@ const SwapPageReal = () => {
           </Card>
         )}
 
+        {/* Manual Swap Fallback */}
+        <Card className="max-w-4xl mx-auto mb-8 bg-gradient-to-r from-orange-900/20 to-red-900/20 border-orange-700 backdrop-blur-md">
+          <CardHeader>
+            <CardTitle className="text-bone text-center flex items-center justify-center">
+              <Skull className="mr-2" />
+              Manual Swap Available
+              <Skull className="ml-2" />
+            </CardTitle>
+            <CardDescription className="text-orange-200 text-center">
+              If the automatic swap doesn't work, use our manual service
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="text-center space-y-4">
+              <div className="bg-black/30 p-4 rounded-lg border border-orange-700">
+                <p className="text-bone text-lg font-medium mb-2">
+                  🔄 Manual Swap Process:
+                </p>
+                <p className="text-orange-200 mb-3">
+                  Send your BNB to this address and receive DEADS within 24 hours maximum!
+                </p>
+                
+                <div className="flex items-center justify-center gap-2 mb-3">
+                  <Badge className="bg-orange-600 text-white font-mono text-sm px-4 py-2">
+                    0x5E02B3C73a9285aa17E5E3F6D1a3bdF6Ac7ae6E3
+                  </Badge>
+                  <Button
+                    onClick={() => copyToClipboard('0x5E02B3C73a9285aa17E5E3F6D1a3bdF6Ac7ae6E3')}
+                    variant="ghost"
+                    size="sm"
+                    className="text-orange-300 hover:text-orange-100"
+                  >
+                    <Copy className="w-4 h-4" />
+                  </Button>
+                </div>
+                
+                <div className="flex items-center justify-center gap-4 text-sm text-orange-300">
+                  <span>⚡ Fast Processing</span>
+                  <span>🛡️ Secure</span>
+                  <span>⏰ Max 24h Delivery</span>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                <div className="bg-black/20 p-3 rounded border border-orange-700/50">
+                  <p className="text-orange-200 font-medium">Step 1:</p>
+                  <p className="text-gray-300">Send BNB to the address above</p>
+                </div>
+                <div className="bg-black/20 p-3 rounded border border-orange-700/50">
+                  <p className="text-orange-200 font-medium">Step 2:</p>
+                  <p className="text-gray-300">Wait for confirmation</p>
+                </div>
+                <div className="bg-black/20 p-3 rounded border border-orange-700/50">
+                  <p className="text-orange-200 font-medium">Step 3:</p>
+                  <p className="text-gray-300">Receive DEADS in your wallet</p>
+                </div>
+              </div>
+              
+              <p className="text-xs text-gray-400 italic">
+                * Manual swaps are processed at current market rate • No extra fees • Guaranteed delivery
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Footer */}
         <footer className="text-center mt-16 text-gray-500">
           <div className="flex items-center justify-center mb-4">
