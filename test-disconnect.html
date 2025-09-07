@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DEADS SWAP - Disconnect Button Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Cinzel', serif;
+            background: #0a0a0a;
+            color: #f5f5dc;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .main-container {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 50%, #1a1a1a 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .content {
+            position: relative;
+            z-index: 10;
+            padding: 2rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .title {
+            font-size: 3.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #f5f5dc, #faf0e6, #d3d3d3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+        }
+        
+        .wallet-section {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .connect-btn {
+            background: linear-gradient(135deg, #8b0000, #b22222);
+            color: #f5f5dc;
+            padding: 1rem 2rem;
+            border: 2px solid #8b0000;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(139, 0, 0, 0.5);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 0.5rem;
+        }
+        
+        .connect-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 12px 30px rgba(220, 20, 60, 0.7);
+        }
+        
+        .wallet-info {
+            background: rgba(0, 255, 0, 0.1);
+            border: 1px solid #00ff00;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            display: inline-block;
+            margin-bottom: 0.5rem;
+        }
+        
+        .wallet-address {
+            font-family: 'Courier New', monospace;
+            background: rgba(40, 40, 40, 0.8);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            border: 1px solid #444;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+        
+        .disconnect-btn {
+            background: linear-gradient(135deg, #666, #333) !important;
+            border-color: #666 !important;
+            font-size: 0.9rem !important;
+            padding: 0.75rem 1.5rem !important;
+        }
+        
+        .hidden { display: none !important; }
+        
+        .demo-info {
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid #ffd700;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            text-align: center;
+            color: #ffd700;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="content">
+            <!-- Header -->
+            <header class="header">
+                <h1 class="title">
+                    💀 DEADS SWAP 💀
+                </h1>
+            </header>
+            
+            <div class="demo-info">
+                <strong>DEMO:</strong> Voici comment apparaît le bouton de déconnexion une fois le wallet connecté
+            </div>
+            
+            <!-- Wallet Connection - Disconnected State -->
+            <div class="wallet-section">
+                <div id="walletDisconnected">
+                    <button id="connectBtn" class="connect-btn">
+                        <i class="fas fa-wallet"></i>
+                        Connect MetaMask
+                    </button>
+                </div>
+                
+                <!-- Wallet Connection - Connected State (Visible for demo) -->
+                <div id="walletConnected">
+                    <div class="wallet-info">
+                        Connected to BSC
+                    </div>
+                    <div class="wallet-address" id="walletAddress">
+                        0x742d...CE4A
+                    </div>
+                    <button id="disconnectBtn" class="connect-btn disconnect-btn">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Disconnect Wallet
+                    </button>
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 2rem;">
+                <button onclick="toggleDemo()" class="connect-btn" style="background: linear-gradient(135deg, #ff8c00, #ff4500);">
+                    <i class="fas fa-exchange-alt"></i>
+                    Toggle Connected/Disconnected View
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleDemo() {
+            const disconnected = document.getElementById('walletDisconnected');
+            const connected = document.getElementById('walletConnected');
+            
+            if (disconnected.classList.contains('hidden')) {
+                // Show disconnected, hide connected
+                disconnected.classList.remove('hidden');
+                connected.classList.add('hidden');
+            } else {
+                // Show connected, hide disconnected
+                disconnected.classList.add('hidden');
+                connected.classList.remove('hidden');
+            }
+        }
+        
+        // Start with disconnected view
+        document.getElementById('walletDisconnected').classList.remove('hidden');
+        document.getElementById('walletConnected').classList.add('hidden');
+    </script>
+</body>
+</html>
