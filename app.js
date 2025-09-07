@@ -21,6 +21,8 @@ const CONTRACT_ABI = [
 // Prix fixe : 0.0002 BNB pour 5 DEADS
 const FIXED_PRICE_BNB = "0.0002";
 const FIXED_DEADS_AMOUNT = "5";
+// Calcul : 1 BNB = 25,000 DEADS (car 5 DEADS = 0.0002 BNB)
+const FIXED_RATE_DISPLAY = "25000"; // 1 BNB = 25,000 DEADS
 
 // Global variables
 let provider, signer, contract;
