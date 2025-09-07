@@ -167,7 +167,7 @@ const SwapPageReal = () => {
 
         {/* Balance Display */}
         {isConnected && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
             <Card className="bg-black/50 border-gray-700 backdrop-blur-sm hover-lift">
               <CardHeader className="pb-3">
                 <CardTitle className="text-bone text-sm flex items-center">
@@ -206,6 +206,7 @@ const SwapPageReal = () => {
                 </p>
               </CardContent>
             </Card>
+            <ContractDebugger />
           </div>
         )}
 
