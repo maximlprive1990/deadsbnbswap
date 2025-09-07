@@ -169,13 +169,12 @@ async function loadBalances() {
         const deadsBal = await contract.balanceOf(walletAddress);
         const deadsBalance = ethers.utils.formatEther(deadsBal);
 
-        // Prix du contrat pour affichage (mais on utilise le prix fixe pour l'achat)
-        const price = await contract.bnbPriceInDeads();
-        const currentPrice = ethers.utils.formatEther(price);
+        // Utiliser le prix fixe au lieu du prix du contrat
+        const currentPrice = FIXED_RATE_DISPLAY; // 1 BNB = 25,000 DEADS
 
         updateBalanceDisplay('bnbBalance', `${parseFloat(bnbBalance).toFixed(4)} BNB`);
         updateBalanceDisplay('deadsBalance', `${parseFloat(deadsBalance).toFixed(2)} DEADS`);
-        updateBalanceDisplay('currentPrice', `1 BNB = ${parseFloat(currentPrice).toLocaleString()} DEADS`);
+        updateBalanceDisplay('currentPrice', `1 BNB = ${parseInt(currentPrice).toLocaleString()} DEADS`);
         
         updateBalanceDisplay('bnbBalanceSmall', parseFloat(bnbBalance).toFixed(4));
         updateBalanceDisplay('deadsBalanceSmall', parseFloat(deadsBalance).toFixed(2));
@@ -183,6 +182,7 @@ async function loadBalances() {
         // Mise à jour de l'affichage du prix fixe
         updateFixedPriceDisplay();
 
+        // Utiliser le prix fixe pour les calculs
         window.currentPriceValue = currentPrice;
         window.bnbBalanceValue = bnbBalance;
         window.deadsBalanceValue = deadsBalance;
