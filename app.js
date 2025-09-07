@@ -96,6 +96,36 @@ async function connectWallet() {
     }
 }
 
+function disconnectWallet() {
+    // Reset all wallet-related variables
+    provider = null;
+    signer = null;
+    contract = null;
+    walletAddress = '';
+    
+    // Reset UI to disconnected state
+    const walletDisconnected = document.getElementById('walletDisconnected');
+    const walletConnected = document.getElementById('walletConnected');
+    const balanceSection = document.getElementById('balanceSection');
+    const swapSection = document.getElementById('swapSection');
+    
+    if (walletDisconnected) walletDisconnected.classList.remove('hidden');
+    if (walletConnected) walletConnected.classList.add('hidden');
+    if (balanceSection) balanceSection.classList.add('hidden');
+    if (swapSection) swapSection.classList.add('hidden');
+    
+    // Reset balance values
+    window.currentPriceValue = null;
+    window.bnbBalanceValue = null;
+    window.deadsBalanceValue = null;
+    
+    // Clear any input fields
+    const deadsAmountInput = document.getElementById('deadsAmount');
+    if (deadsAmountInput) deadsAmountInput.value = '';
+    
+    updateStatus('Wallet disconnected successfully 💀', 'info');
+}
+
 async function initializeWallet() {
     try {
         const web3Provider = new ethers.providers.Web3Provider(window.ethereum);
