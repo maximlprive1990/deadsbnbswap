@@ -207,7 +207,7 @@ function updateFixedPriceDisplay() {
     // Mise à jour de la conversion dans l'onglet d'achat
     const bnbConversion = document.getElementById('bnbConversion');
     if (bnbConversion) {
-        bnbConversion.textContent = `You will receive exactly ${FIXED_DEADS_AMOUNT} DEADS for ${FIXED_PRICE_BNB} BNB`;
+        bnbConversion.textContent = `You will receive exactly ${FIXED_DEADS_AMOUNT} DEADS for ${FIXED_PRICE_BNB} BNB (Fixed Rate: 1 BNB = ${parseInt(FIXED_RATE_DISPLAY).toLocaleString()} DEADS)`;
     }
 }
 
