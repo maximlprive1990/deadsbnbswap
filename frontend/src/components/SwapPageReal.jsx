@@ -7,6 +7,7 @@ import { Badge } from "./ui/badge";
 import { Skull, Wallet, ArrowUpDown, TrendingUp, TrendingDown, RefreshCw, ExternalLink, Copy } from "lucide-react";
 import { toast } from "sonner";
 import { useWallet } from "../context/WalletContext";
+import ContractDebugger from "./ContractDebugger";
 
 const SwapPageReal = () => {
   const {
