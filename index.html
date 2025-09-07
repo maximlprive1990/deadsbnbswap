@@ -576,15 +576,22 @@
                 <div id="buyTab" class="tab-content active">
                     <div class="input-group">
                         <div class="input-label">
-                            <span>BNB Amount</span>
+                            <span>Fixed Price Purchase</span>
                             <span class="balance-info">Balance: <span id="bnbBalanceSmall">0.0000</span> BNB</span>
                         </div>
-                        <input type="number" id="bnbAmount" class="input-field" placeholder="0.0" step="0.001">
-                        <div class="conversion-info" id="bnbConversion">≈ 0 DEADS</div>
+                        <div style="background: #2a2a2a; border: 1px solid #444; border-radius: 8px; padding: 1rem; margin-bottom: 1rem;">
+                            <div style="text-align: center; color: #ffd700; font-size: 1.2rem; font-weight: bold;">
+                                💀 FIXED PRICE: 0.0002 BNB = 5 DEADS 💀
+                            </div>
+                            <div style="text-align: center; color: #888; font-size: 0.9rem; margin-top: 0.5rem;">
+                                No need to enter amount - automatic purchase
+                            </div>
+                        </div>
+                        <div class="conversion-info" id="bnbConversion">You will receive exactly 5 DEADS for 0.0002 BNB</div>
                     </div>
                     <button id="buyBtn" class="swap-btn">
                         <i class="fas fa-skull" id="buyIcon"></i>
-                        <span id="buyText">BUY DEADS</span>
+                        <span id="buyText">BUY 5 DEADS (0.0002 BNB)</span>
                     </button>
                 </div>
                 
