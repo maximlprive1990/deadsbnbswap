@@ -39,10 +39,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function setupEventListeners() {
     const connectBtn = document.getElementById('connectBtn');
+    const disconnectBtn = document.getElementById('disconnectBtn');
     const buyDeadsBtn = document.getElementById('buyBtn');
     const sellDeadsBtn = document.getElementById('sellBtn');
     
     if (connectBtn) connectBtn.addEventListener('click', connectWallet);
+    if (disconnectBtn) disconnectBtn.addEventListener('click', disconnectWallet);
     if (buyDeadsBtn) buyDeadsBtn.addEventListener('click', buyDeads);
     if (sellDeadsBtn) sellDeadsBtn.addEventListener('click', sellDeads);
     
