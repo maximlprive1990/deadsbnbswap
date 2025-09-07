@@ -259,11 +259,43 @@ export const WalletProvider = ({ children }) => {
       setIsLoading(true);
       
       const value = ethers.utils.parseEther(bnbAmount);
-      const gasEstimate = await contract.estimateGas.buyDeadsWithBnb({ value });
+      
+      // First check if the contract has the function and basic validations
+      try {
+        // Try to call the contract function statically first to check for errors
+        await contract.callStatic.buyDeadsWithBnb({ value });
+      } catch (staticError) {
+        console.error('Static call failed:', staticError);
+        
+        // Check common issues
+        if (staticError.message.includes('insufficient')) {
+          toast.error('Insufficient BNB balance or contract liquidity');
+          return;
+        } else if (staticError.message.includes('paused')) {
+          toast.error('Contract is currently paused');
+          return;
+        } else if (staticError.message.includes('minimum')) {
+          toast.error('Amount below minimum purchase requirement');
+          return;
+        } else {
+          toast.error('Transaction would fail. Check contract conditions.');
+          return;
+        }
+      }
+      
+      // If static call succeeds, proceed with actual transaction
+      let gasLimit;
+      try {
+        const gasEstimate = await contract.estimateGas.buyDeadsWithBnb({ value });
+        gasLimit = gasEstimate.mul(150).div(100); // Add 50% buffer for safety
+      } catch (gasError) {
+        console.error('Gas estimation failed, using default:', gasError);
+        gasLimit = ethers.utils.hexlify(300000); // Use default gas limit
+      }
       
       const tx = await contract.buyDeadsWithBnb({ 
         value,
-        gasLimit: gasEstimate.mul(120).div(100) // Add 20% buffer
+        gasLimit
       });
       
       toast.info(`Transaction sent: ${tx.hash}`);
@@ -280,7 +312,17 @@ export const WalletProvider = ({ children }) => {
       return receipt;
     } catch (error) {
       console.error('Buy DEADS error:', error);
-      toast.error(`Transaction failed: ${error.message}`);
+      
+      // Better error messages
+      if (error.code === 'UNPREDICTABLE_GAS_LIMIT') {
+        toast.error('Transaction would fail. Contract may be paused or have insufficient liquidity.');
+      } else if (error.code === 'ACTION_REJECTED') {
+        toast.error('Transaction rejected by user');
+      } else if (error.message.includes('insufficient funds')) {
+        toast.error('Insufficient BNB for transaction + gas fees');
+      } else {
+        toast.error(`Transaction failed: ${error.reason || error.message}`);
+      }
       throw error;
     } finally {
       setIsLoading(false);
